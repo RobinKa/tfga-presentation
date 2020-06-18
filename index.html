@@ -80,12 +80,19 @@
                     <li>Geometric Algebra</li>
                     <li>Geometric Algebra in TensorFlow</li>
                     <li>Geometric Algebra Neural Networks</li>
-                    <li>Applications</li>
-                    <li>Future work</li>
+                    <li>
+                        <div>Applications</div>
+                        <ol>
+                            <li>LieNet</li>
+                            <li>Joint Transform Estimation</li>
+                            <li>Lattice QFT</li>
+                        </ol>
+                    </li>
+                    <li>Conclusion and Future work</li>
                 </ol>
             </section>
             <section>
-                <h2>TensorFlow</h2>
+                <h2>1. TensorFlow</h2>
                 <section>
                     <div>
                         <img style="float: left;" width="384px" src="images/FullColorPrimary Icon.svg" />
@@ -103,7 +110,7 @@
                     </div>
                 </section>
                 <section>
-                    <header>Tensors</header>
+                    <header>Tensors in TF - Multidimensional arrays</header>
                     <div
                         style="display: grid; grid-template-columns: auto auto 1fr; grid-row-gap: 10px; grid-column-gap: 10px; align-items: center;">
                         <div>List of numbers</div>
@@ -127,7 +134,7 @@
                     </div>
                 </section>
                 <section>
-                    <header>Operations</header>
+                    <header>Operations on Tensors</header>
                     <div
                         style="display: grid; grid-template-columns: auto auto 40%; grid-row-gap: 10px; grid-column-gap: 10px; align-items: center;">
                         <div>Addition</div>
@@ -182,7 +189,7 @@
                 </section>
             </section>
             <section>
-                <h2>Neural Networks</h2>
+                <h2>2. Neural Networks</h2>
                 <section>
                     <svg style="margin-left: 20%; margin-top: 10%;" viewbox="0 0 100 100">
                         <text x="28" y="15" font-size="8" fill="white">W<tspan dy="2">ij</tspan></text>
@@ -285,7 +292,7 @@
                         network = Sequential([
                             Dense(units=64, activation="relu"),
                             Dense(units=64, activation="relu"),
-                            Dense(units=40) # 40 classes to predict
+                            Dense(units=40, activation="softmax")
                         ])
                         # loss: term to be minimized
                         network.compile(loss="categorical_crossentropy",
@@ -302,72 +309,30 @@
             </section>
 
             <section>
-                <h2>Geometric Algebra</h2>
+                <h2 style="font-size: 52px;">3. Geometric Algebra</h2>
 
                 <section>
-                    <div>Basis vectors $\{e_x, e_y\}$</div>
-                    <div>Vector $v = v_x e_x + v_y e_y$</div>
-                    <div>
-                        \[\begin{aligned}
-                        a b = &amp; (a_x e_x + a_y e_y) (b_x e_x + b_y e_y) = \\
-                        &amp; a_x b_x e_x e_x + a_y b_y e_y e_y + a_x b_y e_x e_y + a_y b_x e_y e_x = \\
-                        &amp; a_x b_x + a_y b_y + a_x b_y e_x e_y + a_y b_x e_y e_x
-                        \end{aligned} \]
+                    <div style="margin-top: 5%;">
+                        <div>Basis vectors $\{e_x, e_y\}$, Vector $v = v_x e_x + v_y e_y$</div>
                     </div>
-                </section>
-
-                <section>
-                    <div style="font-size: 28px; margin-top: 10%;">Basis vectors anti-commute: $e_{x}e_{y} = -e_{y}e_{x}$</div>
-                    <div>
+                    <div style="text-align: left;">
+                        <div style="font-size: 28px;">Parallel vectors: $e_{x}e_{x} = 1$</div>
+                        <div style="font-size: 28px;">Orthogonal vectors anti-commute: $e_{x}e_{y} = -e_{y}e_{x}$</div>
+                    </div>
+                    <div style="margin-top: -2%;">
                         \[\begin{aligned}
-                        ab = &amp; a_x b_x + a_y b_y &amp; + &amp; a_x b_y e_x e_y + a_y b_x e_y e_x &amp; = \\
+                        a b = &amp; (a_x e_x + a_y e_y) &amp; &amp; (b_x e_x + b_y e_y) &amp; = \\
                         &amp; a_x b_x + a_y b_y &amp; + &amp; (a_x b_y - a_y b_x) e_x e_y &amp; = \\
                         &amp; a \cdot b &amp; + &amp; a \wedge b &amp; \\
                         \end{aligned} \]
                     </div>
-                    <div>
+                    <div style="margin-top: -5%;">
                         <span style="margin-left: -15%;">Inner Product</span>
                         <span style="margin-left: 10%;">Exterior Product</span>
                     </div>
                     <div>
                         <img src="images/Exterior_calc_cross_product.svg" />
                     </div>
-                </section>
-
-                <section>
-                    <header>Vector inverse</header>
-                    <div>
-                        $\frac{a}{a} = \frac{a a}{a a} = 1 \implies a^{-1} = \frac{a}{a a}$
-                    </div>
-                    <div>
-                        $a a = (a_x e_x + a_y e_y)(a_x e_x + a_y e_y) = a_x^2 + a_y^2$
-                    </div>
-                    <div style="margin-top: 5%;">
-                        $a^{-1} = \frac{a}{a \cdot a} = \frac{a}{||a||^2}$
-                    </div>
-                    <div style="margin-top: 5%;">
-                        $a b = c, a = c b^{-1}, b = a^{-1} c$
-                    </div>
-                </section>
-
-                <section>
-                    <header style="margin-top: 5%;">Vector inverse example</header>
-                    <ul>
-                        <li>$a = 1 e_x + 2 e_y, b = 3 e_x + 4 e_y$</li>
-
-                        <li>
-                            $c = a b = (1 e_x + 2 e_y)(3 e_x + 4 e_y) = \\
-                            3 + 4 e_{xy} + 6 e_{yx} + 8= 11 - 2 e_{xy}$
-                        </li>
-
-                        <li>
-                            $b^{-1} = \frac{b}{||b||^2} = \frac{3 e_x + 4 e_y}{9 + 16} = \frac{3}{25} e_x + \frac{4}{25}
-                            e_y$
-                        </li>
-
-                        <li>$c b^{-1} = (11 - 2 e_{xy})(\frac{3}{25} e_x + \frac{4}{25} e_y) = \\ (\frac{11 \cdot 3}{25} -
-                        \frac{2 \cdot 4}{25})e_x + (\frac{11 \cdot 4}{25} + \frac{2 \cdot 3}{25})e_y = 1e_x + 2 e_y = a$</li>
-                    </ul>
                 </section>
 
                 <section>
@@ -386,30 +351,30 @@
                 <section>
                     <ul>
                         <li style="margin-top: 5%;">
-                            <div>Complex numbers / 2D rotation</div>
-                            <div>$e_x^2 = e_y^2 = 1 \implies e_{xy}^2 = -1$</div>
+                            <div style="font-size: 36px;">Complex numbers / 2D rotation</div>
+                            <div style="font-size: 28px;">$e_x^2 = e_y^2 = 1 \implies e_{xy}^2 = -1$</div>
                         </li>
 
                         <li>
-                            <div>Quaternions / 3D rotation</div>
-                            <div>$e_x^2 = e_y^2 = e_z^2 = 1 \implies e_{xy}^2 = e_{yz}^2 = e_{xz}^2 = -1$</div>
+                            <div style="font-size: 36px;">Quaternions / 3D rotation</div>
+                            <div style="font-size: 28px;">$e_x^2 = e_y^2 = e_z^2 = 1 \implies e_{xy}^2 = e_{yz}^2 = e_{xz}^2 = -1$</div>
                         </li>
 
                         <li>
-                            <div>Spacetime algebra (Quantum Electrodynamics, Gravity (GTG))</div>
-                            <div>$e_t^2 = 1, e_x^2 = e_y^2 = e_z^2 = -1$</div>
+                            <div style="font-size: 36px;">Spacetime algebra (Quantum Electrodynamics, Gravity (GTG))</div>
+                            <div style="font-size: 28px;">$e_t^2 = 1, e_x^2 = e_y^2 = e_z^2 = -1$</div>
                         </li>
 
                         <li>
-                            <div>Projective Geometric Algebra (Translations, Rotations, Reflections, Euclidean motion)
+                            <div style="font-size: 36px;">Projective Geometric Algebra (Translations, Rotations, Reflections, Euclidean motion)
                             </div>
-                            <div>$e_0^2 = 0, e_x^2 = e_y^2 = e_z^2 = 1$</div>
+                            <div style="font-size: 28px;">$e_0^2 = 0, e_x^2 = e_y^2 = e_z^2 = 1$</div>
                         </li>
                     </ul>
                 </section>
             </section>
             <section>
-                <h2>GA in TensorFlow</h2>
+                <h2 style="font-size: 52px;">4. GA in TensorFlow</h2>
                 <section>
                     <div style="margin-top: 5%;">Geometric product: multiplication table</div>
                     <div>For $e_1^2 = e_2^2 = 1$</div>
@@ -444,7 +409,7 @@
                         </tbody>
                     </table>
                     <div>Example: $table[e_1, e_{12}] = e_2$</div>
-                    <div>or with blade-indices: $table[1, 3] = 2$</div>
+                    <div>or with blade-indices (Scalar: 0, $e_1$: 1, $e2$: 2, $e12$: 3): $table[1, 3] = 2$</div>
                     <div>Can be precomputed</div>
                 </section>
 
@@ -503,7 +468,7 @@
                 </section>
 
                 <section>
-                    <header>TFGA</header>
+                    <header>TFGA - Tensor API</header>
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
                         ga = tfga.GeometricAlgebra(metric=[1, 1, 1])
 
@@ -524,7 +489,7 @@
                 </section>
 
                 <section>
-                    <header>TFGA</header>
+                    <header>TFGA - Tensor API</header>
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
                         # Grade reversal ~(5 + 5 e_01 + 5 e_02 + 5 e_12)
                         # = 5 + 5 e_10 + 5 e_20 + 5 e_21
@@ -544,7 +509,7 @@
                     </code></pre>
                 </section>
                 <section>
-                    <header>TFGA - MultiVector</header>
+                    <header>TFGA - MultiVector API</header>
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
                         ga = tfga.GeometricAlgebra(metric=[1, 1, 1])
                         a = ga.from_tensor(...)
@@ -564,7 +529,7 @@
                     </code></pre>
                 </section>
                 <section>
-                    <h4>Tensors vs MultiVector</h4>
+                    <h4>Tensor vs MultiVector API</h4>
                     <ul>
                         <li>Tensors: easy TensorFlow interop</li>
                         <li>MultiVector: less verbose, no overhead</li>
@@ -572,7 +537,7 @@
                 </section>
             </section>
             <section>
-                <h2>GA Neural Nets</h2>
+                <h2>5. GA Neural Nets</h2>
                 <section>
                     <div>
                         <div>Standard Dense Layer: $y_{bj} = f(W_{ij} x_{bi} + c_j)$</div>
@@ -607,21 +572,6 @@
                                 bias_blade_indices=odd_indices
                             )
                         </code></pre>
-                    </div>
-                </section>
-
-                <section>
-                    <div>
-                        <div>Example for $(p, q, r) = (2, 0, 0)$</div>
-                        <div>$y_3 = f(W_{03} x_0 + W_{13} x_1 + W_{23} x_2 + ... + c_{3})$</div>
-                        <div>
-                            \[\begin{aligned}
-                            W_{03} x_0 = (W_{03}^{(1)} + W_{03}^{(e_1)} e_1 + W_{03}^{(e_2)} e_2 + W_{03}^{(e_{12})}
-                            e_{12}) \\
-                            (x_{0}^{(1)} + x_{0}^{(e_1)} e_1 + x_{0}^{(e_2)} e_2 + x_{0}^{(e_{12})} e_{12}) + \\
-                            (c_{3}^{(1)} + c_{3}^{(e_1)} e_1 + c_{3}^{(e_2)} e_2 + c_{3}^{(e_{12})} e_{12})
-                            \end{aligned} \]
-                        </div>
                     </div>
                 </section>
 
@@ -664,11 +614,11 @@
             </section>
 
             <section>
-                <h2>GA-NN Applications</h2>
+                <h2>6. GA-NN Applications</h2>
             </section>
 
             <section>
-                <h2>LieNet</h2>
+                <h2>6.1 LieNet</h2>
                 <section>
                     <div style="font-size: 20px;">Deep Learning on Lie Groups for Skeleton-based Action Recognition</div>
                     <img src="images/LieNet_Arch.png" />
@@ -680,7 +630,7 @@
                     <img style="margin-top: 10%;" src="images/LieNet_Viz.png" />
                 </section>
                 <section>
-                    <div style="font-size: 20px;">Implementation in TFGA by Hugo Hadfield</div>
+                    <div style="font-size: 24px;">Implementation in TFGA by Hugo Hadfield</div>
 
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
                         ga = GeometricAlgebra(metric=[1, 1, 1])
@@ -698,6 +648,7 @@
                 </section>
 
                 <section>
+                    <div style="font-size: 24px;">Train model on dataset (Pose-sequence $\rightarrow$ Action)</div>
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
                         model.compile(
                             optimizer="Adam", 
@@ -726,28 +677,34 @@
             </section>
 
             <section>
-                <h4>Joint Transform Estimation</h4>
+                <h4>6.2 Joint Transform Estimation</h4>
                 <section>
                     <img src="images/Mocap.jpg" />
                     <div style="font-size: 12px;">https://www.phasespace.com/applications/3dcharactercreation/</div>
                 </section>
 
                 <section>
-                    <ul>
-                        <li>Data: extract frames from CMU MoCap dataset</li>
-                        <li>Task: given 6 joints' transforms, predict other 31 joints' transforms</li>
-                        <li>Each joint has position and rotation</li>
-                        <li>Representation: motors, even grades of PGA (signature $(3, 0, 1))$</li>
-                        <li>Compare Dense GA NN vs Standard Dense NN</li>
-                    </ul>
-
-                    <div style="font-size: 18px; margin-top: 10%;">Data and Ganja.js visualization: Stephen De Keninck</div>
+                    <div>
+                        <div style="float: left;">
+                            <img width="300px" src="images/cmu.png" />
+                        </div>
+                        <div style="float: right; width: 600px; font-size: 26px;">
+                            <ul>
+                                <li>Data: extract frames from CMU MoCap dataset</li>
+                                <li>Each joint has position and rotation</li>
+                                <li>Representation: Motors in 3D-PGA</li>
+                                <li>Task: given 6 joints' transforms, predict other 31 joints' transforms</li>
+                                <li>Compare Dense GA NN vs Standard Dense NN</li>
+                            </ul>
+                            <div style="font-size: 18px; margin-top: 10%;">Data and Ganja.js visualization: Stephen De Keninck</div>
+                        </div>
+                    </div>
                 </section>
                 <section>
                     <div style="margin-top: 5%;">
                         <img width="500px" src="images/Boneyard_Training.png" style="float: left;" />
                         <h4>Results</h4>
-                        <ul style="width: 40%; font-size: 30px;">
+                        <ul style="width: 40%; font-size: 28px;">
                             <li>GA NN converges quicker, but might just be due to initialization</li>
                             <li>Both converge to same test error</li>
                         </ul>
@@ -759,20 +716,25 @@
             </section>
 
             <section>
-                <h2>Lattice QFT</h2>
+                <h2>6.3 Lattice QFT</h2>
                 <section>
-                    <div>
-                        \[\begin{aligned}
-                        \mathcal{L}_{QED} = &amp; \langle \hbar (\nabla \psi(X)) \gamma_2 \gamma_1 \gamma_3 \widetilde{\psi}(X) - \\
-                        &amp; e A(X) \psi(X) \gamma_0 \widetilde{\psi}(X) - \\
-                        &amp; m \psi(X) \widetilde{\psi}(X) \rangle_0
-                        \end{aligned} \]
+                    <div style="float: right;">
+                        <img src="images/Fluxtube_meson.png" />
                     </div>
-                    <div>Action $S$: Integrate $\mathcal{L}$ over space and time (ie. sum over all grid cells)</div>
-                    <ul>
-                        <li>Many cells, many parallel calculations, perfect for TensorFlow</li>
-                        <li>TensorFlow Probability provides MCMC samplers (or variational inference) needed for lattice QFT</li>
-                    </ul>
+                    <div style="float: left; width: 600px; font-size: 32px; text-align: left;">
+                        <div>
+                            \[\begin{aligned}
+                            \mathcal{L}_{QED}(X) = &amp; \langle \hbar (\nabla \psi(X)) \gamma_2 \gamma_1 \gamma_3 \widetilde{\psi}(X) - \\
+                            &amp; e A(X) \psi(X) \gamma_0 \widetilde{\psi}(X) - \\
+                            &amp; m \psi(X) \widetilde{\psi}(X) \rangle_0
+                            \end{aligned} \]
+                        </div>
+                        <div>Action $S = \int_{\mathcal{X}} \mathcal{L}(X) dX$</div>
+                        <ul>
+                            <li>Many cells, many parallel calculations, perfect for TensorFlow</li>
+                            <li>TensorFlow Probability provides MCMC samplers (or variational inference) needed for lattice QFT</li>
+                        </ul>
+                    </div>
                 </section>
 
                 <section>
@@ -838,8 +800,16 @@
             </section>
 
             <section>
-                <h2>Future work</h2>
-                <section>
+                <h2 style="font-size: 36px;">7. Conclusion and Future work</h2>
+                <section style="font-size: 32px; text-align: left;">
+                    <div><b>Conclusion</b></div>
+                    <ul>
+                        <li>Fast implementation of GA on GPUs</li>
+                        <li>Easy to implement GA NNs with TFGA</li>
+                        <li>Also usable for other high-dimensional problems</li>
+                    </ul>
+
+                    <div><b>Future work</b></div>
                     <ul>
                         <li>Exploit sparsity in GPU-friendly way (AST-rewrite / metaprogramming?)</li>
                         <li>Custom CUDA kernels for GA operations</li>
