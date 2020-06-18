@@ -34,7 +34,7 @@
                             
                         <div style="width: 400px; float: right; font-size: 24px;">
                             <h4 style="font-size: 28px;">Robin Kahlow</h4>
-                            <img width="200px" src="images/Cambrian_Logo.png" />
+                            <img width="200px" src="images/CambrianLogoWhite.png" />
                             <ul>
                                 <li>Machine-Learning and Software Engineer with Cambrian working on Home Visualization</li>
                                 <li>Areas: Machine Learning, Augmented Reality, Computer Vision</li>
@@ -595,9 +595,9 @@
                             # Create algebra with 3 basis vectors squaring to 1
                             ga = tfga.GeometricAlgebra([1, 1, 1])
 
-                            # 1, e12, e13, e23 indices: [0, 4, 5, 6]
+                            # 1, e01, e02, e12 indices: [0, 4, 5, 6]
                             even_indices = ga.get_kind_blade_indices("even")
-                            # e1, e2, e3, e123 indices: [1, 2, 3, 7]
+                            # e0, e1, e2, e012 indices: [1, 2, 3, 7]
                             odd_indices = ga.get_kind_blade_indices("odd")
                             
                             ga_dense_layer = tfga.layers.GeometricProductDense(
@@ -863,7 +863,7 @@
         // - https://revealjs.com/config/
         Reveal.initialize({
             hash: true,
-
+            slideNumber: true,
             math: {
                 mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
                 config: 'TeX-AMS_HTML-full',
