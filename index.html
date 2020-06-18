@@ -453,7 +453,7 @@
 
                 <section>
                     <header style="margin-top: 5%;">Benchmarks</header>
-                    <div style="font-size: 20px;">Geometric product</div>
+                    <div style="font-size: 20px;">Addition</div>
                     <img src="images/bench-add-mv-mv.svg" />
                     <footer style="font-size: 16px;">
                         <div>*clifford-raw: using numba parallel jit (low #elements overhead lower on Linux)</div>
@@ -483,7 +483,7 @@
                 <section>
                     <header>TFGA - Tensor API</header>
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
-                        ga = tfga.GeometricAlgebra(metric=[1, 1, 1])
+                        ga = tfga.GeometricAlgebra([1, 1, 1])
 
                         # Create geometric algebra tf.Tensor for vector blades
                         # (ie. e_0 + e_1 + e_2).
