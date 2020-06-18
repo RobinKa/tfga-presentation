@@ -1,0 +1,880 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>TFGA</title>
+
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/blood.css" id="theme">
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section>
+                <h2>TFGA</h2>
+                <span>TensorFlow-based framework for Geometric Algebra</span>
+            </section>
+            <section>
+                <section>
+                    <h2>About me</h2>
+                    <div>
+                        <div style="float: left;">
+                            <video height="300px" playsinline="" loop="" autoplay="">
+                                <source src="images/Cambrian_Video.webm" type="video/webm">
+                            </video>
+                        </div>
+                            
+                        <div style="width: 400px; float: right; font-size: 24px;">
+                            <h4 style="font-size: 28px;">Robin Kahlow</h4>
+                            <img width="200px" src="images/Cambrian_Logo.png" />
+                            <ul>
+                                <li>Machine-Learning and Software Engineer with Cambrian working on Home Visualization</li>
+                                <li>Areas: Machine Learning, Augmented Reality, Computer Vision</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <img src="images/Cambrian_TryOnAFloor.png" />
+                    <a href="https://floorvanaplus.com/">FLOORVANA+ (Shaw Floors)</a>
+                </section>
+
+                <section>
+                    <img src="images/Cambrian_Planes.png" />
+                </section>
+
+                <section>
+                    <h4>Masked plane finder</h4>
+                    <div style="float: left;">
+                        <img width="500px" src="images/Cambrian_Planes.png" />
+                    </div>
+                        
+                    <ul style="width: 400px; float: right; font-size: 24px;">
+                        <li>Task: Find masked planes in image</li>
+                        <li>Solution: Use neural networks that takes image and outputs masked planes</li>
+                        <li>
+                            <div>Problems</div>
+                            <ul>
+                                <li>How to parameterize planes in neural networks?</li>
+                                <li>What is a good neural network architecture for geometric problems?</li>
+                            </ul>
+                        </li>
+                        <li>Possible answer: Geometric Algebra</li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <h2>Structure</h2>
+                <ol>
+                    <li>TensorFlow</li>
+                    <li>Neural Networks</li>
+                    <li>Geometric Algebra</li>
+                    <li>Geometric Algebra in TensorFlow</li>
+                    <li>Geometric Algebra Neural Networks</li>
+                    <li>Applications</li>
+                    <li>Future work</li>
+                </ol>
+            </section>
+            <section>
+                <h2>TensorFlow</h2>
+                <section>
+                    <div>
+                        <img style="float: left;" width="384px" src="images/FullColorPrimary Icon.svg" />
+                        <div style="width: 500px; float: right; font-size: 30px;">
+                            <ul>
+                                <li>Machine-learning framework for building models</li>
+                                <li>Runs on many devices (CPUs, GPUs, TPUs)</li>
+                                <li>Supports distributed computing</li>
+                                <li>Easy to use (since version 2)</li>
+                                <li>Automatic differentiation</li>
+                                <li>Widely used, a lot of documentation</li>
+                                <li>Mainly for Python</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <header>Tensors</header>
+                    <div
+                        style="display: grid; grid-template-columns: auto auto 1fr; grid-row-gap: 10px; grid-column-gap: 10px; align-items: center;">
+                        <div>List of numbers</div>
+                        <div>$[1, 7, 5]$</div>
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            tf.constant([1, 7, 5],
+                                dtype=tf.float32)
+                        </code></pre>
+
+                        <div>Identity matrix</div>
+                        <div>$\delta_{ij}$</div>
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            tf.eye(num_dims)
+                        </code></pre>
+
+                        <div>3D ones</div>
+                        <div>$\mathbb{1}_{ijk}$</div>
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            tf.ones([size_i, size_j, size_k])
+                        </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <header>Operations</header>
+                    <div
+                        style="display: grid; grid-template-columns: auto auto 40%; grid-row-gap: 10px; grid-column-gap: 10px; align-items: center;">
+                        <div>Addition</div>
+                        <div>$A_{ijk} + B_{ijk}$</div>
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            a + b
+                        </code></pre>
+
+                        <div>Elementwise sine</div>
+                        <div>$sin(A_{ij})$</div>
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            tf.sin(a)
+                        </code></pre>
+
+                        <div>Matrix multiplication</div>
+                        <div>$A_{ij} B_{jk}$</div>
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            tf.matmul(a, b)
+                        </code></pre>
+                    </div>
+                </section>
+                <section>
+                    <header>Einstein-ish notation</header>
+                    <div>$\sum_{k} A_{ijk} \cdot B_{ikl} = A_{ijk} B_{ikl} = C_{ijl}$</div>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        c = tf.einsum("ijk,ikl->ijl", a, b)
+                    </code></pre>
+                    <div>
+                        <ul>
+                            <li>Keep $i$, $j$, $l$ (appear on $C_{ijl})$</li>
+                            <li>Sum over $k$ (doesn't appear on $C_{ijl}$)</li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <header>Automatic differentiation</header>
+
+                    <div>
+                        \[\begin{aligned}
+                        y(x) &amp; = x^2 &amp; \frac{\delta y}{\delta x}(x) &amp; = 2x \\
+                        y(3) &amp; = 9 &amp; \frac{\delta y}{\delta x}(3) &amp; = 6
+                        \end{aligned} \]
+                    </div>
+
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        x = tf.constant(3)
+                        with tf.GradientTape() as tape:
+                            y = x ** 2 # 9
+
+                        print(tape.gradient(y, x)) # 6
+                    </code></pre>
+                </section>
+            </section>
+            <section>
+                <h2>Neural Networks</h2>
+                <section>
+                    <svg style="margin-left: 20%; margin-top: 10%;" viewbox="0 0 100 100">
+                        <text x="28" y="15" font-size="8" fill="white">W<tspan dy="2">ij</tspan></text>
+                        <line x1="20" y1="20" x2="50" y2="30" stroke="#00CCFF" stroke-width="1" />
+                        <line x1="20" y1="20" x2="50" y2="50" stroke="#00CCFF" stroke-width="1" />
+
+                        <line x1="20" y1="40" x2="50" y2="30" stroke="#00CCFF" stroke-width="1" />
+                        <line x1="20" y1="40" x2="50" y2="50" stroke="#00CCFF" stroke-width="1" />
+
+                        <line x1="20" y1="60" x2="50" y2="30" stroke="#00CCFF" stroke-width="1" />
+                        <line x1="20" y1="60" x2="50" y2="50" stroke="#00CCFF" stroke-width="1" />
+
+                        <text x="5" y="15" font-size="8" fill="white">x<tspan dy="2">i</tspan></text>
+                        <circle cx="20" cy="20" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                        <circle cx="20" cy="40" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                        <circle cx="20" cy="60" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+
+                        <text x="55" y="15" font-size="8" fill="white">y<tspan dy="2">j</tspan></text>
+                        <circle cx="50" cy="30" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                        <circle cx="50" cy="50" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                    </svg>
+                </section>
+
+                <section>
+                    <svg viewbox="0 0 100 100" style="width: 40%; height: 40%; margin-top: 5%;">
+                        <text x="28" y="15" font-size="8" fill="white">W<tspan dy="2">ij</tspan></text>
+                        <line x1="20" y1="20" x2="50" y2="30" stroke="#00CCFF" stroke-width="1" />
+                        <line x1="20" y1="20" x2="50" y2="50" stroke="#00CCFF" stroke-width="1" />
+
+                        <line x1="20" y1="40" x2="50" y2="30" stroke="#00CCFF" stroke-width="1" />
+                        <line x1="20" y1="40" x2="50" y2="50" stroke="#00CCFF" stroke-width="1" />
+
+                        <line x1="20" y1="60" x2="50" y2="30" stroke="#00CCFF" stroke-width="1" />
+                        <line x1="20" y1="60" x2="50" y2="50" stroke="#00CCFF" stroke-width="1" />
+
+                        <text x="5" y="15" font-size="8" fill="white">x<tspan dy="2">i</tspan></text>
+                        <circle cx="20" cy="20" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                        <circle cx="20" cy="40" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                        <circle cx="20" cy="60" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+
+                        <text x="55" y="15" font-size="8" fill="white">y<tspan dy="2">j</tspan></text>
+                        <circle cx="50" cy="30" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                        <circle cx="50" cy="50" r="5" stroke="#00CCFF" stroke-width="2" fill="white" />
+                    </svg>
+                    <div style="margin-top: -15%;">
+                        \[\begin{aligned}
+                        y_{j} &amp; = W_{ij} x_{i} &amp; \mbox{(Matrix multiplication)}\\
+                        y_{j} &amp; = W_{ij} x_{i} + c_{j} &amp; \mbox{(+ Bias)}\\
+                        y_{bj} &amp; = W_{ij} x_{bi} + c_{j} &amp; \mbox{(+ Batch dimension)}\\
+                        y_{bj} &amp; = f(W_{ij} x_{bi} + c_{j}) &amp; \mbox{(+ Activation function)}
+                        \end{aligned} \]
+                    </div>
+                </section>
+
+                <section>
+                    <div style="margin-top: 10%;">
+                        <div>$z_{bj} = W_{ij} x_{bi} + c_{j}$</div>
+                        <div>$y_{bj} = f(z_{bj}) = step(z_{bj}) z_{bj} = relu(z_{bj})$</div>
+
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            def dense(x, w, c):
+                                z = tf.matmul(w, x) + c
+                                # or z = tf.einsum("ij,bi->bj", w, x) + c
+
+                                y = tf.nn.relu(z)
+                                return y
+                            
+                            # x has shape [batch, in_units]
+                            w = tf.Variable(tf.random.normal([x.shape[1], 10]))
+                            c = tf.Variable(tf.zeros([10]))
+
+                            with tf.GradientTape() as tape:
+                                y = dense(x, w, c)
+                            dy_dw = tape.gradient(y, w)
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <header>Keras - Layers as objects</header>
+
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        # Layer contains variables.
+                        # Returns relu(Wx + c) when called.
+                        dense_layer = tf.keras.layers.Dense(
+                            units=10, activation="relu"
+                        )
+                        
+                        # x has shape [batch, in_units]
+                        y = dense_layer(x)
+
+                        # Can reuse layer without creating new variables
+                        v = dense_layer(u)
+                    </code></pre>
+                </section>
+
+                <section>
+                    <header>Point-cloud Classification</header>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        network = Sequential([
+                            Dense(units=64, activation="relu"),
+                            Dense(units=64, activation="relu"),
+                            Dense(units=40) # 40 classes to predict
+                        ])
+                        # loss: term to be minimized
+                        network.compile(loss="categorical_crossentropy",
+                                        optimizer="Adam")
+
+                        # inputs: [num_samples, 3*2048] (2048 3d points)
+                        # outputs: [num_samples, 40] (40 classes)
+                        model.fit(train_inputs, train_outputs,
+                                  epochs=10, validation_split=0.1)
+
+                        predictions = model.predict(test_inputs)
+                    </code></pre>
+                </section>
+            </section>
+
+            <section>
+                <h2>Geometric Algebra</h2>
+
+                <section>
+                    <div>Basis vectors $\{e_x, e_y\}$</div>
+                    <div>Vector $v = v_x e_x + v_y e_y$</div>
+                    <div>
+                        \[\begin{aligned}
+                        a b = &amp; (a_x e_x + a_y e_y) (b_x e_x + b_y e_y) = \\
+                        &amp; a_x b_x e_x e_x + a_y b_y e_y e_y + a_x b_y e_x e_y + a_y b_x e_y e_x = \\
+                        &amp; a_x b_x + a_y b_y + a_x b_y e_x e_y + a_y b_x e_y e_x
+                        \end{aligned} \]
+                    </div>
+                </section>
+
+                <section>
+                    <div style="font-size: 28px; margin-top: 10%;">Basis vectors anti-commute: $e_{x}e_{y} = -e_{y}e_{x}$</div>
+                    <div>
+                        \[\begin{aligned}
+                        ab = &amp; a_x b_x + a_y b_y &amp; + &amp; a_x b_y e_x e_y + a_y b_x e_y e_x &amp; = \\
+                        &amp; a_x b_x + a_y b_y &amp; + &amp; (a_x b_y - a_y b_x) e_x e_y &amp; = \\
+                        &amp; a \cdot b &amp; + &amp; a \wedge b &amp; \\
+                        \end{aligned} \]
+                    </div>
+                    <div>
+                        <span style="margin-left: -15%;">Inner Product</span>
+                        <span style="margin-left: 10%;">Exterior Product</span>
+                    </div>
+                    <div>
+                        <img src="images/Exterior_calc_cross_product.svg" />
+                    </div>
+                </section>
+
+                <section>
+                    <header>Vector inverse</header>
+                    <div>
+                        $\frac{a}{a} = \frac{a a}{a a} = 1 \implies a^{-1} = \frac{a}{a a}$
+                    </div>
+                    <div>
+                        $a a = (a_x e_x + a_y e_y)(a_x e_x + a_y e_y) = a_x^2 + a_y^2$
+                    </div>
+                    <div style="margin-top: 5%;">
+                        $a^{-1} = \frac{a}{a \cdot a} = \frac{a}{||a||^2}$
+                    </div>
+                    <div style="margin-top: 5%;">
+                        $a b = c, a = c b^{-1}, b = a^{-1} c$
+                    </div>
+                </section>
+
+                <section>
+                    <header style="margin-top: 5%;">Vector inverse example</header>
+                    <ul>
+                        <li>$a = 1 e_x + 2 e_y, b = 3 e_x + 4 e_y$</li>
+
+                        <li>
+                            $c = a b = (1 e_x + 2 e_y)(3 e_x + 4 e_y) = \\
+                            3 + 4 e_{xy} + 6 e_{yx} + 8= 11 - 2 e_{xy}$
+                        </li>
+
+                        <li>
+                            $b^{-1} = \frac{b}{||b||^2} = \frac{3 e_x + 4 e_y}{9 + 16} = \frac{3}{25} e_x + \frac{4}{25}
+                            e_y$
+                        </li>
+
+                        <li>$c b^{-1} = (11 - 2 e_{xy})(\frac{3}{25} e_x + \frac{4}{25} e_y) = \\ (\frac{11 \cdot 3}{25} -
+                        \frac{2 \cdot 4}{25})e_x + (\frac{11 \cdot 4}{25} + \frac{2 \cdot 3}{25})e_y = 1e_x + 2 e_y = a$</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <header style="margin-bottom: 5%;">Summary</header>
+                    <ul>
+                        <li>Basis vectors: $\{e_0, ..., e_n\}$</li>
+                        <li>Inner product: $e_i \cdot e_j = \begin{cases} -1 / 0 / 1, &amp; i = j \\ 0, &amp; i \neq j
+                            \end{cases}$</li>
+                        <li>Exterior product: $e_i \wedge e_j = \begin{cases} 0, &amp; i = j \\ e_{ij}, &amp; i \neq j
+                            \end{cases}$</li>
+                        <li>Geometric product: $a b = a \cdot b + a \wedge b$</li>
+                        <li>Exterior product anti-commutes: $e_{ij} = -e_{ji}$</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <ul>
+                        <li style="margin-top: 5%;">
+                            <div>Complex numbers / 2D rotation</div>
+                            <div>$e_x^2 = e_y^2 = 1 \implies e_{xy}^2 = -1$</div>
+                        </li>
+
+                        <li>
+                            <div>Quaternions / 3D rotation</div>
+                            <div>$e_x^2 = e_y^2 = e_z^2 = 1 \implies e_{xy}^2 = e_{yz}^2 = e_{xz}^2 = -1$</div>
+                        </li>
+
+                        <li>
+                            <div>Spacetime algebra (Quantum Electrodynamics, Gravity (GTG))</div>
+                            <div>$e_t^2 = 1, e_x^2 = e_y^2 = e_z^2 = -1$</div>
+                        </li>
+
+                        <li>
+                            <div>Projective Geometric Algebra (Translations, Rotations, Reflections, Euclidean motion)
+                            </div>
+                            <div>$e_0^2 = 0, e_x^2 = e_y^2 = e_z^2 = 1$</div>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <h2>GA in TensorFlow</h2>
+                <section>
+                    <div style="margin-top: 5%;">Geometric product: multiplication table</div>
+                    <div>For $e_1^2 = e_2^2 = 1$</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>1</th>
+                                <th>e<sub>1</sub></th>
+                                <th>e<sub>2</sub></th>
+                                <th>e<sub>12</sub></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>e<sub>1</sub></td>
+                                <td>1</td>
+                                <td>e<sub>12</sub></td>
+                                <td>e<sub>2</sub></td>
+                            </tr>
+                            <tr>
+                                <td>e<sub>2</sub></td>
+                                <td>-e<sub>12</sub></td>
+                                <td>1</td>
+                                <td>-e<sub>1</sub></td>
+                            </tr>
+                            <tr>
+                                <td>e<sub>12</sub></td>
+                                <td>-e<sub>2</sub></td>
+                                <td>e<sub>1</sub></td>
+                                <td>1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div>Example: $table[e_1, e_{12}] = e_2$</div>
+                    <div>or with blade-indices: $table[1, 3] = 2$</div>
+                    <div>Can be precomputed</div>
+                </section>
+
+                <section>
+                    <div style="margin-top: 5%;">Multivectors: store blade values as array / on new axis</div>
+                    <div>Eg.: a = $1 + 2 e_x + 3 e_y + 4 e_{xy} \rightarrow [1, 2, 3, 4] = a_i$</div>
+                    <div style="margin-top: 5%;">Dense representation of mult. table as 3-tensor</div>
+                    <div>$C_{ijk}$</div>
+                    <div style="margin-top: 5%;">$a b = y \rightarrow a_i b_j C_{ijk} = y_k$</div>
+
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        a = tf.constant([1, 2, 3, 4]) # shape [4]
+                        b = tf.constant([3, 9, 7, 5]) # shape [4]
+                        # c is precomputed and has shape [4, 4, 4]
+                        y = tf.einsum("i,j,ijk->k", a, b, c) # y shape [4]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <header style="margin-top: 5%;">Benchmarks</header>
+                    <div style="font-size: 20px;">Geometric product</div>
+                    <img src="images/bench-mul-mv-mv.svg" />
+                    <footer style="font-size: 16px;">
+                        <div>*clifford-raw: using numba parallel jit (low #elements overhead lower on Linux)</div>
+                        <div>CPU: AMD 2700X (8C/16T), GPU: Nvidia GTX 1070</div>
+                    </footer>
+                </section>
+
+                <section>
+                    <header style="margin-top: 5%;">Benchmarks</header>
+                    <div style="font-size: 20px;">Geometric product</div>
+                    <img src="images/bench-add-mv-mv.svg" />
+                    <footer style="font-size: 16px;">
+                        <div>*clifford-raw: using numba parallel jit (low #elements overhead lower on Linux)</div>
+                        <div>CPU: AMD 2700X (8C/16T), GPU: Nvidia GTX 1070</div>
+                    </footer>
+                </section>
+
+                <section>
+                    <header>Reminder: Automatic differentiation</header>
+
+                    <div>
+                        $y = a b, \frac{\delta y(a, b)}{\delta a}$
+                    </div>
+
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        a = tf.constant([1, 2, 3, 4]) # shape [4]
+                        b = tf.constant([3, 9, 7, 5]) # shape [4]
+                        with tf.GradientTape() as tape:
+                            # c is precomputed and has shape [4, 4, 4]
+                            y = tf.einsum("i,j,ijk->k", a, b, c)
+
+                        print(tape.gradient(y, a)) # = d/da_i sum(y_j), has shape [4]
+                        print(tape.jacobian(y, a)) # = d/da_i y_j, shape [4, 4]
+                    </code></pre>
+                </section>
+
+                <section>
+                    <header>TFGA</header>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        ga = tfga.GeometricAlgebra(metric=[1, 1, 1])
+
+                        # Create geometric algebra tf.Tensor for vector blades
+                        # (ie. e_0 + e_1 + e_2).
+                        # Result: tf.Tensor [0, 1, 1, 1, 0, 0, 0, 0]
+                        vector = ga.from_tensor_with_kind(
+                            tf.ones(3), kind="vector"
+                        )
+                        # 5 + 5 e_01 + 5 e_02 + 5 e_12
+                        # tf.Tensor [5, 0, 0, 0, 5, 5, 5, 0]
+                        quaternion = ga.from_tensor_with_kind(
+                            tf.fill(dims=4, value=5),
+                            kind="even"
+                        )
+                        ga.print(ga.geom_prod(vector, quaternion))
+                    </code></pre>
+                </section>
+
+                <section>
+                    <header>TFGA</header>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        # Grade reversal ~(5 + 5 e_01 + 5 e_02 + 5 e_12)
+                        # = 5 + 5 e_10 + 5 e_20 + 5 e_21
+                        # = 5 - 5 e_01 - 5 e_02 - 5 e_12
+                        ga.print(ga.reversion(quaternion))
+
+                        # tf.Tensor of shape [1]: -5
+                        # (ie. reversed sign of e_01 component)
+                        ga.print(ga.select_blades(quaternion, "10"))
+
+                        # tf.Tensor of shape [8] with only e_01
+                        # component equal to 5
+                        ga.print(ga.keep_blades(quaternion, "10"))
+
+                        # Exterior product e_01 ^ e_2 = e_012.
+                        ga.print(ga.ext_prod(ga.e01, ga.e2))
+                    </code></pre>
+                </section>
+                <section>
+                    <header>TFGA - MultiVector</header>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        ga = tfga.GeometricAlgebra(metric=[1, 1, 1])
+                        a = ga.from_tensor(...)
+                        b = ga.from_tensor(...)
+
+                        # Wraps tf.Tensors in tfga's MultiVector class which
+                        # provides operator overrides etc.
+                        mv_a = ga(a)
+                        mv_b = ga(b)
+                        
+                        # Reversion ((~mv_a).tensor equivalent to ga.reversion(a))
+                        print(~mv_a)
+                        # Geometric / inner / exterior product
+                        print(mv_a * mv_b, mv_a | mv_b, mv_a ^ mv_b)
+                        # Get back tf.Tensor from the multivector
+                        print(mv_a.tensor)
+                    </code></pre>
+                </section>
+                <section>
+                    <h4>Tensors vs MultiVector</h4>
+                    <ul>
+                        <li>Tensors: easy TensorFlow interop</li>
+                        <li>MultiVector: less verbose, no overhead</li>
+                    </ul>
+                </section>
+            </section>
+            <section>
+                <h2>GA Neural Nets</h2>
+                <section>
+                    <div>
+                        <div>Standard Dense Layer: $y_{bj} = f(W_{ij} x_{bi} + c_j)$</div>
+                        <div>$W_{ij} \in \mathbb{R}^{MN}, c_j \in \mathbb{R}^N$</div>
+                    </div>
+
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        dense_layer = Dense(
+                            units=64, activation="relu"
+                        )
+                    </code></pre>
+                </section>
+
+                <section>
+                    <div>
+                        <div style="margin-top: 10%;">GA Dense Layer: make parameters multivector-valued</div>
+                        <div>$W_{ij} \in \mathbb{Cl}_{(p,q,r)}^{MN}, c_j \in \mathbb{Cl}_{(p,q,r)}^N$</div>
+
+                        <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                            # Create algebra with 3 basis vectors squaring to 1
+                            ga = tfga.GeometricAlgebra([1, 1, 1])
+
+                            # 1, e12, e13, e23 indices: [0, 4, 5, 6]
+                            even_indices = ga.get_kind_blade_indices("even")
+                            # e1, e2, e3, e123 indices: [1, 2, 3, 7]
+                            odd_indices = ga.get_kind_blade_indices("odd")
+                            
+                            ga_dense_layer = tfga.layers.GeometricProductDense(
+                                algebra=ga,
+                                units=64, activation="relu",
+                                kernel_blade_indices=even_indices,
+                                bias_blade_indices=odd_indices
+                            )
+                        </code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <div>
+                        <div>Example for $(p, q, r) = (2, 0, 0)$</div>
+                        <div>$y_3 = f(W_{03} x_0 + W_{13} x_1 + W_{23} x_2 + ... + c_{3})$</div>
+                        <div>
+                            \[\begin{aligned}
+                            W_{03} x_0 = (W_{03}^{(1)} + W_{03}^{(e_1)} e_1 + W_{03}^{(e_2)} e_2 + W_{03}^{(e_{12})}
+                            e_{12}) \\
+                            (x_{0}^{(1)} + x_{0}^{(e_1)} e_1 + x_{0}^{(e_2)} e_2 + x_{0}^{(e_{12})} e_{12}) + \\
+                            (c_{3}^{(1)} + c_{3}^{(e_1)} e_1 + c_{3}^{(e_2)} e_2 + c_{3}^{(e_{12})} e_{12})
+                            \end{aligned} \]
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h4>Choices</h4>
+                    <ul>
+                        <li>Activation function $f$: elementwise or acting on multivector (eg. $e^{a e_{12}} = cos(a) +
+                            e_{12} sin(a)$)?</li>
+                        <li>Geometric product $W_{ij} x_i$ or Sandwich product $W_{ij} x_i \widetilde{W}_{ij}$</li>
+                        <li>Matrix mult $W_{ij} x_i$ or elementwise mult $W_{i} x_i$</li>
+                        <li>Add bias $c_{j}$?</li>
+                        <li>Algebra / signature</li>
+                        <li>Subalgebra for $W_{ij}$ and $c_{j}$</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <div>No activation, sandwich product, elementwise multiplication, no bias, quaternion weights</div>
+                    <div style="margin-top: 2%;">$y_i^{(1)} = W_{i} x_i \widetilde{W}_{i}$</div>
+
+                    <div style="margin-top: 5%;">Two layers</div>
+                    <div>$y_i^{(2)} = U_{i} y_i^{(1)} \widetilde{U}_{i} = U_{i} W_{i} x_i \widetilde{W}_{i}
+                        \widetilde{U}_{i}$</div>
+
+                    <div style="margin-top: 5%;">Composition of rotation</div>
+                    <div>Multi-layer reduces to one layer</div>
+                </section>
+
+                <section>
+                    <div style="margin-top: 6%;">Log input, Exp on final output, ReLU activation, geometric product, matrix multiplication, bias, quaternion weights</div>
+                    <div style="margin-top: 2%;">$x_i^{(1)} = log(x_i^{(0)})$</div>
+
+                    <div style="margin-top: 2%;">$x_j^{(n+1)} = relu(W_{ij}^{(n)} x_i^{(n)} + c_j^{(n)})$</div>
+
+                    <div style="margin-top: 2%;">$y_j = e^{W_{ij}^{(N-1)} x_i^{(N-1)} + c_j^{(N-1)}}$</div>
+
+                    <div style="margin-top: 2%;">$log$ goes from Lie group to algebra</div>
+                    <div>$exp$ goes from Lie algebra to group</div>
+                </section>
+            </section>
+
+            <section>
+                <h2>GA-NN Applications</h2>
+            </section>
+
+            <section>
+                <h2>LieNet</h2>
+                <section>
+                    <div style="font-size: 20px;">Deep Learning on Lie Groups for Skeleton-based Action Recognition</div>
+                    <img src="images/LieNet_Arch.png" />
+                </section>
+                <section>
+                    <img src="images/LieNet_Pooling.png" width="600px" />
+                </section>
+                <section>
+                    <img style="margin-top: 10%;" src="images/LieNet_Viz.png" />
+                </section>
+                <section>
+                    <div style="font-size: 20px;">Implementation in TFGA by Hugo Hadfield</div>
+
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        ga = GeometricAlgebra(metric=[1, 1, 1])
+
+                        model = Sequential([
+                            TensorToGeometric(ga, blade_indices=[6, 5, 4, 0]),
+                            RotMap(ga, use_bias=False), 
+                            LogMap(ga),
+                            Flatten(),
+                            ReLU(),
+                            Dense(units=20),
+                            Softmax(axis=-1)
+                        ])
+                    </code></pre>
+                </section>
+
+                <section>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        model.compile(
+                            optimizer="Adam", 
+                            loss="sparse_categorical_crossentropy",
+                            metrics=["sparse_categorical_accuracy"]
+                        )
+
+                        model.fit(
+                            x=inputs_train, y=labels_train, 
+                            validation_data=(inputs_test, labels_test),
+                            epochs=100
+                        )
+                    </code></pre>
+                </section>
+                <section>
+                    <div style="margin-top: 5%;">
+                        <img src="images/LieNet_Accuracy.png" style="float: left;" />
+                        <h4>Results</h4>
+                        <ul style="width: 40%; font-size: 30px;">
+                            <li>Relatively easy and quick to implement using TFGA</li>
+                            <li>Accuracy verified</li>
+                            <li>But: outperformed by simple Dense ReLU NN (~90% accuracy)</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <section>
+                <h4>Joint Transform Estimation</h4>
+                <section>
+                    <img src="images/Mocap.jpg" />
+                    <div style="font-size: 12px;">https://www.phasespace.com/applications/3dcharactercreation/</div>
+                </section>
+
+                <section>
+                    <ul>
+                        <li>Data: extract frames from CMU MoCap dataset</li>
+                        <li>Task: given 6 joints' transforms, predict other 31 joints' transforms</li>
+                        <li>Each joint has position and rotation</li>
+                        <li>Representation: motors, even grades of PGA (signature $(3, 0, 1))$</li>
+                        <li>Compare Dense GA NN vs Standard Dense NN</li>
+                    </ul>
+
+                    <div style="font-size: 18px; margin-top: 10%;">Data and Ganja.js visualization: Stephen De Keninck</div>
+                </section>
+                <section>
+                    <div style="margin-top: 5%;">
+                        <img width="500px" src="images/Boneyard_Training.png" style="float: left;" />
+                        <h4>Results</h4>
+                        <ul style="width: 40%; font-size: 30px;">
+                            <li>GA NN converges quicker, but might just be due to initialization</li>
+                            <li>Both converge to same test error</li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <iframe width="800px" height="600px" src="https://enkimute.github.io/boneyard/viz/viz.html?predictions.csv"></iframe>
+                </section>
+            </section>
+
+            <section>
+                <h2>Lattice QFT</h2>
+                <section>
+                    <div>
+                        \[\begin{aligned}
+                        \mathcal{L}_{QED} = &amp; \langle \hbar (\nabla \psi(X)) \gamma_2 \gamma_1 \gamma_3 \widetilde{\psi}(X) - \\
+                        &amp; e A(X) \psi(X) \gamma_0 \widetilde{\psi}(X) - \\
+                        &amp; m \psi(X) \widetilde{\psi}(X) \rangle_0
+                        \end{aligned} \]
+                    </div>
+                    <div>Action $S$: Integrate $\mathcal{L}$ over space and time (ie. sum over all grid cells)</div>
+                    <ul>
+                        <li>Many cells, many parallel calculations, perfect for TensorFlow</li>
+                        <li>TensorFlow Probability provides MCMC samplers (or variational inference) needed for lattice QFT</li>
+                    </ul>
+                </section>
+
+                <section>
+                    $m \psi(X) \widetilde{\psi}(X)$
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        sta = tfga.GeometricAlgebra([1, -1, -1, -1])
+                        
+                        def get_mass_term(psi, electron_mass):
+                            return (electron_mass *
+                                sta.geom_prod(psi, sta.reversion(psi)
+                            )
+                    </code></pre>
+                </section>
+
+                <section>
+                    $e A(X) \psi(X) \gamma_0 \widetilde{\psi}(X)$
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        def get_interaction_term(psi, a, electron_charge):
+                            return sta.geom_prod(
+                                electron_charge * a,
+                                sta.geom_prod(
+                                    psi,
+                                    sta.geom_prod(sta.e0, sta.reversion(psi))
+                                )
+                            )
+                    </code></pre>
+                </section>
+
+                <section>
+                    $\hbar (\nabla \psi(X)) \gamma_2 \gamma_1 \gamma_3 \widetilde{\psi}(X)$
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        def get_momentum_term(psi, spacing, hbar):
+                            dt_psi = finite_differences(psi, axis=0, spacing=spacing)
+                            dx_psi = finite_differences(psi, axis=1, spacing=spacing)
+                            dy_psi = finite_differences(psi, axis=2, spacing=spacing)
+                            dz_psi = finite_differences(psi, axis=3, spacing=spacing)
+                            d_psi = dt_psi + dx_psi + dy_psi + dz_psi
+
+                            return sta.geom_prod(
+                                hbar * d_psi,
+                                sta.geom_prod(sta.e213, sta.reversion(psi))
+                            )
+                    </code></pre>
+                </section>
+
+                <section>
+                    <div>Sum cells' $\mathcal{L}$ to get Action $S$</div>
+                    <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
+                        def get_action(psi, a, electron_charge):
+                            mass_term = get_mass_term(psi=psi,
+                                electron_mass=electron_mass)
+                            int_term = get_interaction_term(psi=psi,
+                                a=a, electron_charge=electron_charge)
+                            mom_term = get_momentum_term(psi=psi,
+                                spacing=spacing, hbar=hbar)
+                        
+                            # Sum terms and get scalar part
+                            lagrangians = (mom_term - mass_term - int_term)[..., 0]
+                        
+                            return tf.reduce_sum(lagrangians)
+                    </code></pre>
+                </section>
+            </section>
+
+            <section>
+                <h2>Future work</h2>
+                <section>
+                    <ul>
+                        <li>Exploit sparsity in GPU-friendly way (AST-rewrite / metaprogramming?)</li>
+                        <li>Custom CUDA kernels for GA operations</li>
+                        <li>Improve API consistency (eg. blade arguments)</li>
+                        <li>More layers, more operations, ...</li>
+                        <li>Explore and implement more applications</li>
+                    </ul>
+                </section>
+            </section>
+        </div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/math/math.js"></script>
+    <script>
+        // More info about initialization & config:
+        // - https://revealjs.com/initialization/
+        // - https://revealjs.com/config/
+        Reveal.initialize({
+            hash: true,
+
+            math: {
+                mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+                config: 'TeX-AMS_HTML-full',
+                // pass other options into `MathJax.Hub.Config()`
+                TeX: { Macros: { RR: "{\\bf R}" } }
+            },
+
+            // Learn about plugins: https://revealjs.com/plugins/
+            plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMath]
+        });
+    </script>
+</body>
+
+</html>
