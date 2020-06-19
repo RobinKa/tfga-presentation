@@ -524,7 +524,7 @@
                 <section>
                     <header>TFGA - MultiVector API</header>
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
-                        ga = tfga.GeometricAlgebra(metric=[1, 1, 1])
+                        ga = tfga.GeometricAlgebra([1, 1, 1])
                         a = ga.from_tensor(...)
                         b = ga.from_tensor(...)
 
@@ -643,7 +643,7 @@
                     <div style="font-size: 24px;">Implementation in TFGA by Hugo Hadfield</div>
 
                     <pre data-id="code-animation"><code class="hljs" data-trim data-line-numbers>
-                        ga = GeometricAlgebra(metric=[1, 1, 1])
+                        ga = GeometricAlgebra([1, 1, 1])
 
                         model = Sequential([
                             TensorToGeometric(ga, blade_indices=[6, 5, 4, 0]),
